@@ -19,6 +19,19 @@ export const executeQuery = async (connectionId, query) => {
   return response.data;
 };
 
+export const executeUserQuery = async (dbConfig, query) => {
+  const response = await api.post('/query/execute', {
+    host: dbConfig.host,
+    port: dbConfig.port,
+    user: dbConfig.user,
+    password: dbConfig.password,
+    database: dbConfig.database,
+    dbType: dbConfig.type,
+    query
+  });
+  return response.data;
+};
+
 export const disconnectDatabase = async (connectionId) => {
   const response = await api.post('/database/disconnect', { connectionId });
   return response.data;

@@ -6,11 +6,12 @@ import ResultTable from '../components/ResultTable';
 import DatabaseConnection from '../components/DatabaseConnection';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useApp } from '../context/AppContext';
-import { executeQuery, optimizeQuery, getSuggestions } from '../utils/api';
+import { executeQuery, executeUserQuery, optimizeQuery, getSuggestions } from '../utils/api';
 import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const { connectionId, isConnected, schema, currentDatabase, addToHistory } = useApp();
+  const [dbConfig, setDbConfig] = useState(null);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -25,8 +26,10 @@ const Dashboard = () => {
     setSuggestions([]); // Clear previous suggestions
     
     try {
-      // Execute query
-      const response = await executeQuery(connectionId, query.sqlQuery);
+      // Execute query using user's database config
+      const response = dbConfig ? 
+        await executeUserQuery(dbConfig, query.sqlQuery) :
+        await executeQuery(connectionId, query.sqlQuery);
       
       setMessages(prev => [...prev, {
         type: 'assistant',
@@ -108,7 +111,7 @@ const Dashboard = () => {
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-bold mb-4 sm:mb-6 lg:mb-8 dark:text-white">
               Connect to Database
             </h1>
-            <DatabaseConnection />
+            <DatabaseConnection onConfigChange={setDbConfig} />
           </div>
         </div>
       </div>

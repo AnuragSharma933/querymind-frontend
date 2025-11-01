@@ -4,7 +4,7 @@ import { connectDatabase, getSchema, disconnectDatabase } from '../utils/api';
 import { useApp } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
-const DatabaseConnection = () => {
+const DatabaseConnection = ({ onConfigChange }) => {
   const { connectionId, setConnectionId, setIsConnected, setCurrentDatabase, setSchema, isConnected } = useApp();
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -30,6 +30,11 @@ const DatabaseConnection = () => {
       // Fetch schema
       const schemaResponse = await getSchema(response.data.connectionId);
       setSchema(schemaResponse.data.schema);
+
+      // Pass config to parent
+      if (onConfigChange) {
+        onConfigChange(config);
+      }
 
       toast.success('Connected successfully!');
     } catch (error) {
